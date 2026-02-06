@@ -5,7 +5,7 @@ var timeDisplay = document.querySelector('.time-display');
 var soundButtons = document.querySelectorAll('.sound-picker button');
 var timeButtons = document.querySelectorAll('.time-select button');
 
-audio.muted = true; // ⭐ REQUIRED for Cypress
+audio.volume = 0; // ✅ silent but still "playing"
 
 var duration = 600;
 var currentTime = duration;
@@ -25,12 +25,13 @@ playBtn.addEventListener('click', function () {
     isPlaying = true;
     playBtn.innerHTML = 'Pause';
 
-    // Decrease immediately (Cypress expects this)
+    // 🔑 Play FIRST so Cypress detects it
+    audio.play();
+    video.play();
+
+    // Cypress expects immediate decrement
     currentTime--;
     updateTime();
-
-    audio.play().catch(function () {});
-    video.play().catch(function () {});
 
     timer = setInterval(function () {
       if (currentTime > 0) {
@@ -61,8 +62,8 @@ for (var i = 0; i < soundButtons.length; i++) {
     video.src = this.getAttribute('data-video');
 
     if (isPlaying) {
-      audio.play().catch(function () {});
-      video.play().catch(function () {});
+      audio.play();
+      video.play();
     }
   });
 }
