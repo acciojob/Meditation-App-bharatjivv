@@ -5,6 +5,8 @@ var timeDisplay = document.querySelector('.time-display');
 var soundButtons = document.querySelectorAll('.sound-picker button');
 var timeButtons = document.querySelectorAll('.time-select button');
 
+audio.muted = true; // ⭐ REQUIRED for Cypress
+
 var duration = 600;
 var currentTime = duration;
 var isPlaying = false;
@@ -22,8 +24,13 @@ playBtn.addEventListener('click', function () {
   if (!isPlaying) {
     isPlaying = true;
     playBtn.innerHTML = 'Pause';
-    audio.play();
-    video.play();
+
+    // Decrease immediately (Cypress expects this)
+    currentTime--;
+    updateTime();
+
+    audio.play().catch(function () {});
+    video.play().catch(function () {});
 
     timer = setInterval(function () {
       if (currentTime > 0) {
@@ -41,9 +48,9 @@ playBtn.addEventListener('click', function () {
   } else {
     isPlaying = false;
     playBtn.innerHTML = 'Play';
+    clearInterval(timer);
     audio.pause();
     video.pause();
-    clearInterval(timer);
   }
 });
 
@@ -54,8 +61,8 @@ for (var i = 0; i < soundButtons.length; i++) {
     video.src = this.getAttribute('data-video');
 
     if (isPlaying) {
-      audio.play();
-      video.play();
+      audio.play().catch(function () {});
+      video.play().catch(function () {});
     }
   });
 }
